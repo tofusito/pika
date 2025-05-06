@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("openaiApiKey") private var openaiApiKey = ""
     @State private var isApiKeyVisible = false
     @Environment(\.dismiss) private var dismiss

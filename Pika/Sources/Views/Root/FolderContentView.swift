@@ -18,7 +18,7 @@ struct FolderContentView: View {
     @State private var showErrorStripe = false
     @State private var showErrorText = false
     @State private var listRefreshID = UUID()
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("isDarkMode") private var isDarkMode = true
     private let errorStripeHeight: CGFloat = 32
 
     var body: some View {

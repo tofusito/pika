@@ -26,7 +26,7 @@ struct ContentView: View {
     }()
 
     @State private var navigationPath: [FileNavigationItem] = []
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("isDarkMode") private var isDarkMode = true
     @EnvironmentObject private var floatingButtonStore: FloatingButtonStore
 
     var body: some View {

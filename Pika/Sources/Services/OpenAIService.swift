@@ -104,7 +104,7 @@ final class OpenAIService {
         }
         - Do NOT hallucinate content; only reformat or enhance what is present.
 
-        In addition, provide up to **3 concise, context-aware suggestions** under the key \\"suggestions\\" that could help improve, extend, or deepen the note. These should be brief (max 30 characters each) and relevant to the specific content, such as:
+        In addition, provide up to **3 concise, context-aware suggestions** under the key \\"suggestions\\" that could help improve, extend, or deepen the note. In english. These should be brief (max 30 characters each) and relevant to the specific content, such as:
         - Add source or reference
         - Make a checklist
         - Create a comparison table
