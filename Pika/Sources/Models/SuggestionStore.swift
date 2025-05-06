@@ -207,37 +207,37 @@ class SuggestionStore: ObservableObject {
         return false
     }
     
-    /// Borra las sugerencias guardadas para una nota específica
+    /// Deletes saved suggestions for a specific note
     func deleteSavedSuggestions(forNoteURL noteURL: URL) {
         let key = noteURL.path
         noteSuggestionsCache.removeValue(forKey: key)
         saveAllSuggestions()
     }
     
-    /// Guarda todas las sugerencias en UserDefaults
+    /// Saves all suggestions to UserDefaults
     func saveAllSuggestions() {
         do {
             let data = try JSONEncoder().encode(noteSuggestionsCache)
             UserDefaults.standard.set(data, forKey: suggestionsStorageKey)
-            print("Todas las sugerencias guardadas correctamente. Total: \(noteSuggestionsCache.count)")
+            print("All suggestions saved successfully. Total: \(noteSuggestionsCache.count)")
         } catch {
-            print("Error al guardar sugerencias: \(error.localizedDescription)")
+            print("Error saving suggestions: \(error.localizedDescription)")
         }
     }
     
-    /// Carga todas las sugerencias guardadas desde UserDefaults
+    /// Loads all saved suggestions from UserDefaults
     private func loadAllSavedSuggestions() {
         guard let data = UserDefaults.standard.data(forKey: suggestionsStorageKey) else { 
-            print("No hay sugerencias guardadas previamente")
+            print("No previously saved suggestions")
             return 
         }
         
         do {
             let decoded = try JSONDecoder().decode([String: NoteSuggestions].self, from: data)
             noteSuggestionsCache = decoded
-            print("Sugerencias cargadas. Total: \(decoded.count)")
+            print("Suggestions loaded. Total: \(decoded.count)")
         } catch {
-            print("Error al cargar sugerencias: \(error.localizedDescription)")
+            print("Error loading suggestions: \(error.localizedDescription)")
         }
     }
 } 

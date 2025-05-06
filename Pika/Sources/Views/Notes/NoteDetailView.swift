@@ -607,7 +607,7 @@ struct NoteDetailView: View {
         // Call OpenAI service asynchronously
         Task {
             do {
-                let result = try await OpenAIService.shared.transformNoteText(text)
+                let result = try await OpenAIService.shared.transformNote(rawText: text)
                 
                 // Update on main thread
                 await MainActor.run {

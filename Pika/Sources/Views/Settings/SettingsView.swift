@@ -36,7 +36,7 @@ struct SettingsView: View {
                         }
                     }
                     
-                    Text("Necesaria para funciones avanzadas de IA.")
+                    Text("Required for advanced AI features.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -44,7 +44,7 @@ struct SettingsView: View {
                 .foregroundColor(isDarkMode ? .white : .black)
             }
             .scrollContentBackground(.hidden)
-            // En dark mode, usar gris oscuro de sistema como fondo del menú
+            // In dark mode, use dark system gray as menu background
             .background(isDarkMode ? Color(.systemGray6) : Color.white)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -57,9 +57,9 @@ struct SettingsView: View {
                 }
             }
         }
-        // Fondo total de la pantalla
+        // Full screen background
         .background((isDarkMode ? Color.black : Color.white).ignoresSafeArea())
-        // Forzar color scheme y acento minimalista
+        // Force color scheme and minimalist accent
         .preferredColorScheme(isDarkMode ? .dark : .light)
         .tint(.primary)
     }

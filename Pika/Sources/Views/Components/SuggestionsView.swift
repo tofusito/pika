@@ -126,25 +126,25 @@ struct SuggestionsView: View {
         }
     }
     
-    /// Aplica la sugerencia seleccionada utilizando la API
+    /// Applies the selected suggestion using the API
     private func applySuggestion(_ suggestion: String) {
         guard !isApplyingSuggestion, 
               let noteURL = store.currentNoteURL, 
               let currentText = store.currentFormattedText else {
-            // Si no tenemos los datos necesarios, aplicamos la sugerencia de forma simple
+            // If we don't have the necessary data, apply the suggestion in a simple way
             onSelectSuggestion(suggestion)
             store.hideSuggestions()
             return
         }
         
-        // Marcar esta sugerencia como en progreso
+        // Mark this suggestion as in progress
         isApplyingSuggestion = true
         suggestionInProgress = suggestion
         
-        // Obtener las sugerencias actuales
+        // Get current suggestions
         let allSuggestions = store.suggestions
         
-        // Llamar a la API para aplicar la sugerencia
+        // Call API to apply the suggestion
         Task {
             do {
                 let result = try await OpenAIService.shared.applySuggestion(
@@ -153,14 +153,14 @@ struct SuggestionsView: View {
                     selectedSuggestion: suggestion
                 )
                 
-                // Actualizar en el hilo principal
+                // Update on main thread
                 await MainActor.run {
-                    // Guardar las nuevas sugerencias en memoria para que estén disponibles
-                    // al presionar el botón flotante de nuevo
+                    // Save new suggestions in memory so they're available
+                    // when pressing the floating button again
                     store.suggestions = result.suggestions
                     store.currentFormattedText = result.formatted
                     
-                    // Guardar en caché para persistencia
+                    // Save to cache for persistence
                     store.saveSuggestions(
                         formatted: result.formatted, 
                         suggestions: result.suggestions, 
@@ -168,26 +168,26 @@ struct SuggestionsView: View {
                         textModified: false
                     )
                     
-                    // Forzar guardado en UserDefaults inmediatamente
+                    // Force save to UserDefaults immediately
                     store.saveAllSuggestions()
                     
-                    // Informar al padre para que actualice la nota con el texto actualizado
+                    // Inform the parent to update the note with updated text
                     onSelectSuggestion(result.formatted)
                     
-                    // Ocultar las sugerencias después de aplicar la seleccionada
-                    // pero NO limpiar el array de sugerencias en memoria
+                    // Hide suggestions after applying the selected one
+                    // but DO NOT clear the suggestions array in memory
                     store.hideSuggestions()
                     
-                    // Completar
+                    // Complete
                     isApplyingSuggestion = false
                     suggestionInProgress = nil
                 }
             } catch {
-                print("Error al aplicar sugerencia: \(error.localizedDescription)")
+                print("Error applying suggestion: \(error.localizedDescription)")
                 
-                // Actualizamos en el hilo principal
+                // Update on main thread
                 await MainActor.run {
-                    // Si hay un error, aplicamos la sugerencia de forma simple
+                    // If there's an error, apply the suggestion in a simple way
                     onSelectSuggestion(suggestion)
                     store.hideSuggestions()
                     
@@ -199,7 +199,7 @@ struct SuggestionsView: View {
     }
 }
 
-/// Tarjeta individual para cada sugerencia
+/// Individual card for each suggestion
 struct SuggestionCard: View {
     let suggestion: String
     let backgroundColor: Color
@@ -223,7 +223,7 @@ struct SuggestionCard: View {
                 Spacer()
                 
                 if isLoading {
-                    // Punto pulsante como indicador de carga
+                    // Pulsing dot as loading indicator
                     Circle()
                         .fill(textColor)
                         .frame(width: 16, height: 16)
@@ -234,7 +234,7 @@ struct SuggestionCard: View {
                             }
                         }
                 } else {
-                    // Ícono normal
+                    // Normal icon
                     Image(systemName: "arrow.forward.circle.fill")
                         .foregroundColor(colorScheme == .dark ? .black : .white)
                         .font(.system(size: 22))

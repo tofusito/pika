@@ -214,9 +214,9 @@ struct FolderContentView: View {
 
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
-        // Grupo de acciones principales en la barra de navegación
+        // Main actions group in the navigation bar
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            // Crear nueva carpeta
+            // Create new folder
             Button {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     showNewFolderField = true
@@ -230,7 +230,7 @@ struct FolderContentView: View {
                     .foregroundColor(isDarkMode ? .white : .black)
             }
 
-            // Modo selección
+            // Selection mode
             Button {
                 isSelecting.toggle()
             } label: {
@@ -239,7 +239,7 @@ struct FolderContentView: View {
                     .foregroundColor(isDarkMode ? .white : .black)
             }
 
-            // Menú opciones (Settings, Info)
+            // Options menu (Settings, Info)
             Menu {
                 Button("Settings") { showSettings = true }
                 Button("Info") { showAppInfo = true }
@@ -249,7 +249,7 @@ struct FolderContentView: View {
                     .foregroundColor(isDarkMode ? .white : .black)
             }
         }
-        // Botón de mover seleccionados en la barra inferior
+        // Move selected button in the bottom bar
         if isSelecting {
             ToolbarItem(placement: .bottomBar) {
                 Button {

@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Item de navegación: carpeta o nota
+/// Navigation item: folder or note
 enum FileNavigationItem: Hashable {
     case directory(URL)
     case note(url: URL, autoFocus: Bool)
 }
 
-/// Modelo sencillo para representar un archivo o carpeta
+/// Simple model to represent a file or folder
 struct FileItem: Hashable {
     let url: URL
     var isDirectory: Bool {
@@ -30,15 +30,15 @@ struct ContentView: View {
     @EnvironmentObject private var floatingButtonStore: FloatingButtonStore
 
     var body: some View {
-        // NavigationStack sin el botón flotante
+        // NavigationStack without the floating button
         NavigationStack(path: $navigationPath) {
-            // Listado de carpetas y notas
+            // Folders and notes listing
             FolderContentView(
                 rootURL: rootURL,
                 directoryURL: currentDirectoryURL(),
                 navigationPath: $navigationPath
             )
-            // Destinos de navegación para carpetas y notas dentro de la pila
+            // Navigation destinations for folders and notes within the stack
             .navigationDestination(for: FileNavigationItem.self) { item in
                 switch item {
                 case .directory(let url):
@@ -71,16 +71,16 @@ struct ContentView: View {
                 .allowsHitTesting(false)
         )
         .onAppear {
-            // Configurar el botón flotante para añadir notas en la carpeta actual
+            // Configure floating button to add notes in the current folder
             setupFloatingButton()
         }
         .onChange(of: navigationPath) { oldValue, newValue in
-            // Actualizar el botón cuando cambia la navegación
+            // Update button when navigation changes
             setupFloatingButton()
         }
     }
             
-    // Helper para obtener la URL de la carpeta actual desde navigationPath
+    // Helper to get the current folder URL from navigationPath
     private func currentDirectoryURL() -> URL {
         if let last = navigationPath.last, case .directory(let url) = last {
             return url
@@ -88,7 +88,7 @@ struct ContentView: View {
         return rootURL
     }
     
-    // Verifica si estamos viendo una nota
+    // Check if we are viewing a note
     private func isViewingNote() -> Bool {
         if let last = navigationPath.last, case .note = last {
             return true
@@ -96,14 +96,14 @@ struct ContentView: View {
         return false
     }
     
-    // Configurar el botón flotante según el contexto actual
+    // Configure the floating button based on current context
     private func setupFloatingButton() {
         if isViewingNote() {
-            // En la vista de nota, ocultamos el botón y dejamos que NoteDetailView lo configure
-            // Esto evita conflictos durante la transición
+            // In note view, hide the button and let NoteDetailView configure it
+            // This avoids conflicts during transition
             floatingButtonStore.hide()
         } else {
-            // En vista de carpetas, configuramos para añadir notas
+            // In folders view, configure to add notes
             floatingButtonStore.setupForAddNote(
                 folderURL: currentDirectoryURL(), 
                 createCallback: createNewNote
@@ -111,7 +111,7 @@ struct ContentView: View {
         }
     }
         
-    // Crear nota en la carpeta actual
+    // Create note in the current folder
     private func createNewNote(in url: URL) {
         let fm = FileManager.default
         let df = DateFormatter(); df.dateFormat = "yyyy-MM-dd HH-mm-ss"
@@ -124,7 +124,7 @@ struct ContentView: View {
 
 // Removed old fileListView, helper methods, and state properties in favor of FolderContentView
 
-// Fila para carpeta con toggle inline y botón de navegación
+// Folder row with inline toggle and navigation button
 struct FolderRow: View {
     let url: URL
     let isExpanded: Bool
@@ -164,7 +164,7 @@ struct FolderRow: View {
     }
 }
 
-// Fila para nota que navega al editor
+// Note row that navigates to the editor
 struct NoteRow: View {
     let url: URL
     let onSelect: () -> Void

@@ -1,13 +1,13 @@
 import Foundation
 import Network
 
-/// Estructura de salida esperada desde la API de OpenAI
+/// Expected output structure from the OpenAI API
 struct NoteOutput: Codable {
     let formatted: String
     let suggestions: [String]
 }
 
-/// Errores específicos de OpenAIService
+/// Specific errors for OpenAIService
 enum OpenAIServiceError: LocalizedError {
     case missingAPIKey
     case apiError(statusCode: Int, message: String)
@@ -17,18 +17,18 @@ enum OpenAIServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "La clave de OpenAI no está configurada. Ve a Ajustes para guardarla."
+            return "OpenAI key is not configured. Go to Settings to save it."
         case .apiError(_, let message):
             return message
         case .malformedResponse:
-            return "Respuesta mal formada desde OpenAI."
+            return "Malformed response from OpenAI."
         case .networkUnavailable:
-            return "No hay conexión a internet."
+            return "No internet connection."
         }
     }
 }
 
-/// Servicio para llamar a OpenAI sin librerías externas
+/// Service to call OpenAI without external libraries
 final class OpenAIService {
     static let shared = OpenAIService()
     private init() {}
@@ -46,17 +46,18 @@ final class OpenAIService {
         let output: [Item]
     }
 
-    /// Obtiene la API key desde UserDefaults
-    private var apiKey: String {
-        UserDefaults.standard.string(forKey: "openaiApiKey") ?? ""
+    /// Gets the API key from UserDefaults
+    private func getApiKey() -> String? {
+        UserDefaults.standard.string(forKey: "openaiApiKey")
     }
-    /// Verifica si la API key está configurada
-    private var isApiKeyConfigured: Bool {
-        !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    
+    /// Checks if the API key is configured
+    var isApiKeyConfigured: Bool {
+        getApiKey()?.isEmpty == false
     }
 
-    /// Construye una sesión URLSession ephemeral para evitar reutilizar estado HTTP/3 en simulador
-    private func makeSession() -> URLSession {
+    /// Builds an ephemeral URLSession to avoid reusing HTTP/3 state in simulator
+    private func createURLSession() -> URLSession {
         let config = URLSessionConfiguration.ephemeral
         config.waitsForConnectivity = true
         config.allowsExpensiveNetworkAccess = true
@@ -67,21 +68,21 @@ final class OpenAIService {
         return URLSession(configuration: config)
     }
 
-    /// Transforma un texto crudo en nota formateada y sugerencias
-    /// - Parameter rawText: Texto desordenado de entrada
-    /// - Returns: NoteOutput con 'formatted' y 'suggestions'
-    func transformNoteText(_ rawText: String) async throws -> NoteOutput {
-        // 1. Verificar conectividad de red
+    /// Transforms raw text into formatted note and suggestions
+    /// - Parameter rawText: Unstructured input text
+    /// - Returns: NoteOutput with 'formatted' and 'suggestions'
+    func transformNote(rawText: String) async throws -> NoteOutput {
+        // 1. Verify network connectivity
         guard NetworkMonitor.shared.isConnected else {
             throw OpenAIServiceError.networkUnavailable
         }
 
-        // 2. Comprobar API key
+        // 2. Check API key
         guard isApiKeyConfigured else {
             throw OpenAIServiceError.missingAPIKey
         }
 
-        // 3. Construir prompt y formato estructurado
+        // 3. Build prompt and structured format
         let systemInstructions = """
         You are a writing assistant for a note-taking app.
 
@@ -118,7 +119,7 @@ final class OpenAIService {
         }
         """
 
-        // 4. Preparar el cuerpo de la petición con JSON Schema para salida estricta
+        // 4. Prepare request body with JSON Schema for strict output
         let modelName = "gpt-4.1-mini"
         let schema: [String: Any] = [
             "type": "object",
@@ -140,7 +141,7 @@ final class OpenAIService {
                 ["role": "user",   "content": rawText]
             ],
             "temperature": 0.7,
-            // Instrucción de formato estructurado
+            // Structured format instruction
             "text": [
                 "format": [
                     "type": "json_schema",
@@ -151,15 +152,15 @@ final class OpenAIService {
             ]
         ]
 
-        // 5. Configurar URLRequest
-        let url = URL(string: "https://api.openai.com/v1/responses")! // endpoint con soporte de "text.format"
+        // 5. Configure URLRequest
+        let url = URL(string: "https://api.openai.com/v1/responses")! // endpoint with "text.format" support
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(getApiKey()!)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
 
-        // 5b. Desactivar HTTP/3 en simulador
+        // 5b. Disable HTTP/3 in simulator
         #if targetEnvironment(simulator)
         request.assumesHTTP3Capable = false
         #endif
@@ -173,8 +174,8 @@ final class OpenAIService {
         }
         #endif
 
-        // 6. Enviar petición con reintentos y backoff
-        let session = makeSession()
+        // 6. Send request with retries and backoff
+        let session = createURLSession()
         var dataResponse: Data?
         var urlResponse: URLResponse?
         let retryCodes: Set<URLError.Code> = [.networkConnectionLost, .notConnectedToInternet, .timedOut]
@@ -203,7 +204,7 @@ final class OpenAIService {
             throw OpenAIServiceError.malformedResponse
         }
 
-        // 7. Validar status code
+        // 7. Validate status code
         guard response.statusCode == 200 else {
             let errJSON = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
             let msg = (errJSON?["error"] as? [String: Any])?["message"] as? String 
@@ -211,9 +212,9 @@ final class OpenAIService {
             throw OpenAIServiceError.apiError(statusCode: response.statusCode, message: msg)
         }
 
-        // Imprimir siempre solo las suggestions
+        // Print always only the suggestions
         if let raw = String(data: data, encoding: .utf8) {
-            // Extraer suggestions del JSON
+            // Extract suggestions from JSON
             if let wrapper = try? JSONDecoder().decode(APIWrapper.self, from: data),
                let contentText = wrapper.output.first?.content.first?.text,
                let innerData = contentText.data(using: .utf8),
@@ -227,7 +228,7 @@ final class OpenAIService {
             print("← RAW Response JSON: <non UTF8 data>")
         }
 
-        // 8. Extraer `formatted` y `suggestions` desde el JSON anidado
+        // 8. Extract `formatted` and `suggestions` from nested JSON
         let wrapper = try JSONDecoder().decode(APIWrapper.self, from: data)
         guard let contentText = wrapper.output.first?.content.first?.text,
               let innerData = contentText.data(using: .utf8),
@@ -243,24 +244,24 @@ final class OpenAIService {
         return output
     }
 
-    /// Aplica una sugerencia seleccionada al texto de la nota y genera una nueva sugerencia
+    /// Applies a selected suggestion to the note text and generates a new suggestion
     /// - Parameters:
-    ///   - currentText: Texto actual de la nota (ya formateado)
-    ///   - allSuggestions: Lista de todas las sugerencias actuales
-    ///   - selectedSuggestion: La sugerencia que el usuario ha seleccionado para aplicar
-    /// - Returns: NoteOutput con texto formateado actualizado y sugerencias actualizadas
+    ///   - currentText: Current note text (already formatted)
+    ///   - allSuggestions: List of all current suggestions
+    ///   - selectedSuggestion: The suggestion selected by the user to apply
+    /// - Returns: NoteOutput with updated formatted text and updated suggestions
     func applySuggestion(currentText: String, allSuggestions: [String], selectedSuggestion: String) async throws -> NoteOutput {
-        // 1. Verificar conectividad de red
+        // 1. Verify network connectivity
         guard NetworkMonitor.shared.isConnected else {
             throw OpenAIServiceError.networkUnavailable
         }
 
-        // 2. Comprobar API key
+        // 2. Check API key
         guard isApiKeyConfigured else {
             throw OpenAIServiceError.missingAPIKey
         }
 
-        // 3. Construir prompt y formato estructurado
+        // 3. Build prompt and structured format
         let systemInstructions = """
             You are a writing assistant for a note-taking app. 
             
@@ -287,10 +288,10 @@ final class OpenAIService {
             }
         """
         
-        // Determinar cuáles son las sugerencias que no se seleccionaron
+        // Determine which suggestions were not selected
         let nonSelectedSuggestions = allSuggestions.filter { $0 != selectedSuggestion }
         
-        // 4. Crear el mensaje del usuario con la información necesaria
+        // 4. Create user message with necessary information
         let userMessage = """
         CURRENT TEXT:
         \(currentText)
@@ -308,7 +309,7 @@ final class OpenAIService {
         4. Add ONE new suggestion that is different from all existing ones
         """
 
-        // 5. Preparar el cuerpo de la petición con JSON Schema para salida estricta
+        // 5. Prepare request body with JSON Schema for strict output
         let modelName = "gpt-4.1-mini"
         let schema: [String: Any] = [
             "type": "object",
@@ -330,7 +331,7 @@ final class OpenAIService {
                 ["role": "user",   "content": userMessage]
             ],
             "temperature": 0.7,
-            // Instrucción de formato estructurado
+            // Structured format instruction
             "text": [
                 "format": [
                     "type": "json_schema",
@@ -341,15 +342,15 @@ final class OpenAIService {
             ]
         ]
 
-        // 6. Configurar URLRequest
-        let url = URL(string: "https://api.openai.com/v1/responses")! // endpoint con soporte de "text.format"
+        // 6. Configure URLRequest
+        let url = URL(string: "https://api.openai.com/v1/responses")! // endpoint with "text.format" support
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(getApiKey()!)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
 
-        // 6b. Desactivar HTTP/3 en simulador
+        // 6b. Disable HTTP/3 in simulator
         #if targetEnvironment(simulator)
         request.assumesHTTP3Capable = false
         #endif
@@ -359,8 +360,8 @@ final class OpenAIService {
         print("→ Non-selected suggestions to keep: \(nonSelectedSuggestions)")
         #endif
 
-        // 7. Enviar petición con reintentos y backoff
-        let session = makeSession()
+        // 7. Send request with retries and backoff
+        let session = createURLSession()
         var dataResponse: Data?
         var urlResponse: URLResponse?
         let retryCodes: Set<URLError.Code> = [.networkConnectionLost, .notConnectedToInternet, .timedOut]
@@ -385,7 +386,7 @@ final class OpenAIService {
             throw OpenAIServiceError.malformedResponse
         }
 
-        // 8. Validar status code
+        // 8. Validate status code
         guard response.statusCode == 200 else {
             let errJSON = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
             let msg = (errJSON?["error"] as? [String: Any])?["message"] as? String 
@@ -393,7 +394,7 @@ final class OpenAIService {
             throw OpenAIServiceError.apiError(statusCode: response.statusCode, message: msg)
         }
 
-        // 9. Extraer `formatted` y `suggestions` desde el JSON anidado
+        // 9. Extract `formatted` and `suggestions` from nested JSON
         let wrapper = try JSONDecoder().decode(APIWrapper.self, from: data)
         guard let contentText = wrapper.output.first?.content.first?.text,
               let innerData = contentText.data(using: .utf8),
@@ -403,7 +404,7 @@ final class OpenAIService {
             throw OpenAIServiceError.malformedResponse
         }
         
-        // Verificar que las sugerencias no seleccionadas están presentes
+        // Verify that non-selected suggestions are present
         #if DEBUG
         let suggestionsSet = Set(suggestions)
         let nonSelectedSet = Set(nonSelectedSuggestions)

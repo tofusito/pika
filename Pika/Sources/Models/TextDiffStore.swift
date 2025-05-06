@@ -2,27 +2,27 @@ import Foundation
 import SwiftUI
 import Combine
 
-/// Store para manejar las diferencias de texto y los cambios
+/// Store for handling text differences and changes
 class TextDiffStore: ObservableObject {
-    /// Singleton compartido
+    /// Shared singleton
     static let shared = TextDiffStore()
     
-    /// Texto original antes de los cambios
+    /// Original text before changes
     @Published var originalText: String = ""
     
-    /// Texto modificado después de los cambios
+    /// Modified text after changes
     @Published var modifiedText: String = ""
     
-    /// Indica si hay diferencias activas para mostrar
+    /// Indicates if there are active differences to show
     @Published var hasDiff: Bool = false
     
-    /// Líneas que han sido modificadas (índices base 0)
+    /// Lines that have been modified (0-based indices)
     @Published var modifiedLines: Set<Int> = []
     
-    /// Constructor privado para singleton
+    /// Private constructor for singleton
     private init() {}
     
-    /// Inicia una sesión de diff con el texto original
+    /// Starts a diff session with the original text
     func startDiff(original: String) {
         self.originalText = original
         self.modifiedText = original
@@ -30,20 +30,20 @@ class TextDiffStore: ObservableObject {
         self.modifiedLines = []
     }
     
-    /// Actualiza el texto modificado y calcula las diferencias
+    /// Updates the modified text and calculates differences
     func updateModifiedText(_ newText: String) {
         self.modifiedText = newText
         calculateDiff()
     }
     
-    /// Acepta los cambios, estableciendo el nuevo texto como original
+    /// Accepts changes, setting the new text as original
     func acceptChanges() {
         self.originalText = self.modifiedText
         self.hasDiff = false
         self.modifiedLines = []
     }
     
-    /// Rechaza los cambios, volviendo al texto original
+    /// Rejects changes, returning to the original text
     func rejectChanges() -> String {
         self.modifiedText = self.originalText
         self.hasDiff = false
@@ -51,7 +51,7 @@ class TextDiffStore: ObservableObject {
         return self.originalText
     }
     
-    /// Calcula qué líneas han sido modificadas con algoritmo mejorado
+    /// Calculates which lines have been modified with improved algorithm
     private func calculateDiff() {
         let originalLines = originalText.components(separatedBy: "\n")
         let modifiedLines = modifiedText.components(separatedBy: "\n")
