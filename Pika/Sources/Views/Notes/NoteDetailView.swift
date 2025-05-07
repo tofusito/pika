@@ -59,6 +59,9 @@ struct NoteDetailView: View {
     @State private var hasPreviousText: Bool = false
     @State private var showUndoButton: Bool = false
     
+    // Estado para el teclado
+    @State private var isKeyboardVisible: Bool = false
+    
     // Get the current note title
     private var noteTitle: String {
         currentURL.deletingPathExtension().lastPathComponent
@@ -197,6 +200,15 @@ struct NoteDetailView: View {
                                             diffStore.updateModifiedText(newValue)
                                         }
                                     })
+                                    .toolbar {
+                                        // Añadimos botón de minimizar teclado cuando este esté visible
+                                        ToolbarItemGroup(placement: .keyboard) {
+                                            Spacer()
+                                            Button("Done") {
+                                                isEditorFocused = false
+                                            }
+                                        }
+                                    }
                                 
                                 if text.isEmpty && !isEditorFocused {
                                     // Show placeholder only when text is empty and editor is unfocused
@@ -506,6 +518,9 @@ struct NoteDetailView: View {
             
             // Configurar el botón flotante para esta vista
             setupFloatingButton()
+            
+            // Configurar notificaciones del teclado
+            setupKeyboardNotifications()
         }
         .onDisappear {
             // Hide suggestions when user exits view
@@ -514,6 +529,9 @@ struct NoteDetailView: View {
             // Cancelar el timer de la pildorita si existe
             editPillTimer?.invalidate()
             editPillTimer = nil
+            
+            // Eliminar notificaciones del teclado
+            removeKeyboardNotifications()
         }
         .onChange(of: text, { oldValue, newValue in
             // Save automatically only if there's no active diff
@@ -543,6 +561,71 @@ struct NoteDetailView: View {
                 suggestionStore.showCustomInputRequested = false
             }
         })
+        .onChange(of: isEditorFocused, { oldValue, newValue in
+            // Cuando cambia el foco del editor, actualizamos la visibilidad del botón flotante
+            if newValue {
+                // Si el editor recibe el foco, el teclado aparecerá, ocultamos el botón
+                isKeyboardVisible = true
+                floatingButtonStore.hide()
+            } else if isKeyboardVisible {
+                // Si el editor pierde el foco y el teclado estaba visible, mostrar botón flotante
+                isKeyboardVisible = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    setupFloatingButton()
+                }
+            }
+        })
+        // Observar la visibilidad de las sugerencias para ocultar/mostrar el botón flotante
+        .onChange(of: suggestionStore.isVisible, { oldValue, newValue in
+            if newValue {
+                // Si las sugerencias son visibles, ocultamos el botón flotante
+                floatingButtonStore.hide()
+            } else if !isKeyboardVisible {
+                // Si las sugerencias se ocultan y el teclado no está visible, mostramos el botón flotante
+                setupFloatingButton()
+            }
+        })
+    }
+    
+    // Setup keyboard notifications
+    private func setupKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillShowNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            isKeyboardVisible = true
+            floatingButtonStore.hide()
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillHideNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            isKeyboardVisible = false
+            // Solo mostrar botón si las sugerencias no están visibles
+            if !suggestionStore.isVisible {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    setupFloatingButton()
+                }
+            }
+        }
+    }
+    
+    // Remove keyboard notifications
+    private func removeKeyboardNotifications() {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     // Configurar el botón flotante según el estado actual
