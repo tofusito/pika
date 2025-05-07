@@ -241,6 +241,17 @@ struct ContentView: View {
                             .padding(.leading, 20)
                             .listRowInsets(EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 16))
                             .listRowBackground(Color.clear)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    deleteNote(subItem.url)
+                                } label: {
+                                    Text("Eliminar")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 10)
+                                }
+                                .tint(Color(red: 0.8, green: 0.2, blue: 0.2))
+                            }
                         }
                     }
                 }
@@ -265,6 +276,17 @@ struct ContentView: View {
                     }
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            deleteNote(item.url)
+                        } label: {
+                            Text("Eliminar")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10)
+                        }
+                        .tint(Color(red: 0.8, green: 0.2, blue: 0.2))
+                    }
                 }
             }
         }
@@ -500,6 +522,18 @@ struct ContentView: View {
             }
         } catch {
             print("Error creating directory: \(error.localizedDescription)")
+        }
+    }
+
+    // Función para eliminar una nota
+    private func deleteNote(_ url: URL) {
+        let fileManager = FileManager.default
+        do {
+            try fileManager.removeItem(at: url)
+            // Forzar actualización de la lista
+            listRefreshID = UUID()
+        } catch {
+            print("Error al eliminar nota: \(error.localizedDescription)")
         }
     }
 }
