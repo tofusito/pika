@@ -43,6 +43,9 @@ struct ContentView: View {
     @State private var showErrorText = false
     @State private var listRefreshID = UUID()
     private let errorStripeHeight: CGFloat = 32
+    @State private var showDeleteConfirmation = false
+    @State private var itemToDelete: URL? = nil
+    @State private var isDeletingFolder = false
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -194,6 +197,19 @@ struct ContentView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 .listRowBackground(Color.clear)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button {
+                        itemToDelete = item.url
+                        isDeletingFolder = true
+                        showDeleteConfirmation = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 10)
+                    }
+                    .tint(Color(red: 0.8, green: 0.2, blue: 0.2))
+                }
 
                 if expandedInline.contains(item.url) {
                     let children = fetchItems(in: item.url)
@@ -243,10 +259,12 @@ struct ContentView: View {
                             .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button {
-                                    deleteNote(subItem.url)
+                                    itemToDelete = subItem.url
+                                    isDeletingFolder = false
+                                    showDeleteConfirmation = true
                                 } label: {
-                                    Text("Eliminar")
-                                        .font(.system(size: 16, weight: .bold))
+                                    Image(systemName: "trash")
+                                        .font(.headline)
                                         .foregroundColor(.white)
                                         .padding(.vertical, 10)
                                 }
@@ -278,10 +296,12 @@ struct ContentView: View {
                     .listRowBackground(Color.clear)
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button {
-                            deleteNote(item.url)
+                            itemToDelete = item.url
+                            isDeletingFolder = false
+                            showDeleteConfirmation = true
                         } label: {
-                            Text("Eliminar")
-                                .font(.system(size: 16, weight: .bold))
+                            Image(systemName: "trash")
+                                .font(.headline)
                                 .foregroundColor(.white)
                                 .padding(.vertical, 10)
                         }
@@ -296,6 +316,24 @@ struct ContentView: View {
         .background((isDarkMode ? Color.black : Color.white).ignoresSafeArea())
         .environment(\.defaultMinListRowHeight, 60)
         .listRowSeparator(.hidden)
+        .alert(isPresented: $showDeleteConfirmation) {
+            Alert(
+                title: Text(isDeletingFolder ? "Delete Folder" : "Delete Note"),
+                message: Text(isDeletingFolder 
+                            ? "Are you sure you want to delete this folder? This will permanently delete all notes and subfolders contained within it." 
+                            : "Are you sure you want to delete this note? This action cannot be undone."),
+                primaryButton: .destructive(Text("Delete")) {
+                    if let url = itemToDelete {
+                        if isDeletingFolder {
+                            deleteFolder(url)
+                        } else {
+                            deleteNote(url)
+                        }
+                    }
+                },
+                secondaryButton: .cancel(Text("Cancel"))
+            )
+        }
     }
             
     // Helper to get the current folder URL from navigationPath
@@ -525,6 +563,32 @@ struct ContentView: View {
         }
     }
 
+    // Función para eliminar una carpeta
+    private func deleteFolder(_ url: URL) {
+        let fileManager = FileManager.default
+        do {
+            try fileManager.removeItem(at: url)
+            // Forzar actualización de la lista
+            listRefreshID = UUID()
+            
+            // Si la carpeta está en el path de navegación, volver atrás
+            if navigationPath.contains(where: { 
+                if case .directory(let navURL) = $0, navURL == url {
+                    return true
+                }
+                return false
+            }) {
+                while let last = navigationPath.last, 
+                      case .directory(let navURL) = last, 
+                      navURL == url || navURL.path.starts(with: url.path) {
+                    navigationPath.removeLast()
+                }
+            }
+        } catch {
+            print("Error al eliminar carpeta: \(error.localizedDescription)")
+        }
+    }
+
     // Función para eliminar una nota
     private func deleteNote(_ url: URL) {
         let fileManager = FileManager.default
@@ -532,6 +596,16 @@ struct ContentView: View {
             try fileManager.removeItem(at: url)
             // Forzar actualización de la lista
             listRefreshID = UUID()
+            
+            // Si la nota está en el path de navegación, volver atrás
+            if let index = navigationPath.firstIndex(where: { 
+                if case .note(let navURL, _) = $0, navURL == url {
+                    return true
+                }
+                return false
+            }) {
+                navigationPath.remove(at: index)
+            }
         } catch {
             print("Error al eliminar nota: \(error.localizedDescription)")
         }
