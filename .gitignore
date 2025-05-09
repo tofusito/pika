@@ -1,6 +1,51 @@
-.build
+# Xcode
+## User settings
+xcuserdata/
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+.idea/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# macOS
 .DS_Store
-.idea
-.vscode
-.vscode/*
-.vscode/*/*
+.AppleDouble
+.LSOverride
+._*
+
+# Secrets and API keys
+*.pem
+*.cer
+*.p12
+*.mobileprovision
+.env
+Secrets.swift
+APIKeys.swift
+Credentials.swift
+**/Config/Secrets.swift
+
+# Obj-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection
+iOSInjectionProject/

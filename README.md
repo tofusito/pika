@@ -32,7 +32,7 @@ Pika your thoughts. Let AI enhance them. Create stunning notes effortlessly.
 - [💭 Philosophy](#-philosophy)
 - [🛣️ What's Next?](#️-whats-next)
 - [🤝 Contributing](#-contributing)
-- [📝 License](#-license)
+- [📝 License and Legal](#-license-and-legal)
 
 ---
 
@@ -242,9 +242,27 @@ Contributions are welcome! Please check out our [Contributing Guidelines](CONTRI
 
 ---
 
-## 📝 License
+## 📝 License and Legal
 
-Custom license - Source code is available for viewing and educational purposes, but commercial usage and distribution rights are reserved by the author. See the [LICENSE](LICENSE) file for details.
+**IMPORTANT LEGAL NOTICE:**
+
+Pika is released under a proprietary license that provides specific rights while reserving others. By accessing, forking, cloning, or using this repository in any way, you agree to comply with the terms set forth in our legal documentation.
+
+Key legal points:
+- ✅ Personal Use: You may download, compile, and use the app on your personal devices
+- ✅ Code Contributions: You may submit contributions under our [contribution guidelines](CONTRIBUTING.md)
+- ✅ Educational Use: You may use the code for learning and teaching purposes
+- ❌ Commercial Use: Commercial usage requires explicit written permission
+- ❌ App Store Publishing: Publishing to any app store is strictly prohibited without authorization
+- ❌ Trademark Usage: The Pika name and logo cannot be used without permission
+
+**Legal Documentation:**
+- [LICENSE](LICENSE) - Complete proprietary license terms
+- [COPYRIGHT.md](COPYRIGHT.md) - Copyright and intellectual property notices
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution terms and requirements
+- [SECURITY.md](SECURITY.md) - Security vulnerability reporting procedures
+
+Unauthorized use may result in legal action. See the [LICENSE](LICENSE) file for complete terms.
 
 ---
 
