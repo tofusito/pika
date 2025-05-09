@@ -58,7 +58,7 @@ Inspired by the creative process itself, where brilliant ideas need to be captur
 
 <p align="center">
   <!-- App screenshot - Replace with actual screenshot -->
-  <img src="Resources/Screenshots/main_screen.png" alt="Pika Main Screen" width="300" />
+  <img src="Resources/Screenshots/main_screen.png" alt="Pika Main Screen" width="700" />
   <!-- You'll need to create screenshots of your app and place them in Resources/Screenshots/ -->
 </p>
 
