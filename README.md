@@ -1,15 +1,11 @@
 <p align="center">
-  <!-- Banner image - Replace with actual banner -->
   <img src="Resources/Banner/banner.png" alt="Pika Banner" width="600" />
-  <!-- You'll need to create this banner image showing the app and place it in Resources/Banner/ -->
 </p>
 
 # 📝 Pika – Capture Now, Enhance Later
 
 <p align="center">
-  <!-- App icon image - Replace with actual icon -->
   <img src="Resources/Icon/icon_resource.png" alt="Pika Logo" width="150" />
-  <!-- You'll need to place your app icon in Resources/Icon/ -->
 </p>
 
 <p align="center">
@@ -124,12 +120,6 @@ Notes/
 - `SuggestionStore`: Manages AI-generated suggestions  
 - `OpenAIService`: Interacts with OpenAI for text transformations
 
-<p align="center">
-  <!-- Architecture diagram - Replace with actual diagram -->
-  <img src="Resources/Diagrams/architecture.png" alt="Pika Architecture" width="600" />
-  <!-- You can create a simple architecture diagram to illustrate your app's structure -->
-</p>
-
 ---
 
 ## 💡 Smart Features
@@ -160,7 +150,13 @@ Pika doesn't just transform your text; it provides helpful suggestions:
 
 <p align="center">
   <!-- Feature showcase - Replace with actual screenshots -->
-  <img src="Resources/Screenshots/features.png" alt="Pika Features" width="700" />
+  <img src="Resources/Screenshots/features-1.png" alt="Pika Features" width="700" />
+  <!-- A collage of screenshots showing different features in action would be great here -->
+</p>
+
+<p align="center">
+  <!-- Feature showcase - Replace with actual screenshots -->
+  <img src="Resources/Screenshots/features-2.png" alt="Pika Features" width="700" />
   <!-- A collage of screenshots showing different features in action would be great here -->
 </p>
 
