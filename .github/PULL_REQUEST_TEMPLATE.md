@@ -37,7 +37,7 @@ By submitting this pull request, I confirm that:
 - [ ] I have read and agree to the terms in the [LICENSE](../LICENSE) file
 - [ ] I have read and agree to the [CONTRIBUTING.md](../CONTRIBUTING.md) guidelines
 - [ ] I understand that my contribution, if accepted, will be subject to the project's proprietary license
-- [ ] I agree to grant Manuel Gutiérrez all rights to my contribution as described in the [COPYRIGHT.md](../COPYRIGHT.md) file
+- [ ] I agree to grant Manuel J. Gutiérrez all rights to my contribution as described in the [COPYRIGHT.md](../COPYRIGHT.md) file
 
 ## Additional Notes
 <!-- Add any other information about the PR here --> 

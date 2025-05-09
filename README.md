@@ -266,10 +266,4 @@ Unauthorized use may result in legal action. See the [LICENSE](LICENSE) file for
 
 ---
 
-**Made with ❤️ and ☕ by [Manuel Gutiérrez](https://www.buymeacoffee.com/tofusito)**
-
-<p align="center">
-  <!-- Final app screenshot or logo - Replace with actual image -->
-  <img src="Resources/Screenshots/outro.png" alt="Pika in action" width="400" />
-  <!-- A nice closing screenshot would be great here -->
-</p> 
+**Made with ❤️ and ☕ by [Manuel J. Gutiérrez](https://www.buymeacoffee.com/tofusito)**

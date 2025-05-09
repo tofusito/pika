@@ -8,7 +8,7 @@ By submitting a contribution to this project, you are agreeing to the following 
 
 1. You confirm that you are the original creator of the contribution or have all necessary rights to submit the contribution under the terms of our license.
 
-2. You grant Manuel Gutiérrez (the "Author") a perpetual, worldwide, non-exclusive, irrevocable, royalty-free, sublicensable license to use, reproduce, modify, distribute, and otherwise exploit your contribution.
+2. You grant Manuel J. Gutiérrez (the "Author") a perpetual, worldwide, non-exclusive, irrevocable, royalty-free, sublicensable license to use, reproduce, modify, distribute, and otherwise exploit your contribution.
 
 3. You understand and agree that your contribution will be licensed under the same proprietary license as the Pika project, as detailed in the [LICENSE](LICENSE) file.
 

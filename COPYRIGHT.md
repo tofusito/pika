@@ -1,6 +1,6 @@
 # Copyright Notice
 
-Copyright © 2023-2024 Manuel Gutiérrez. All Rights Reserved.
+Copyright © 2023-2025 Manuel J. Gutiérrez. All Rights Reserved.
 
 ## Protected Materials
 
