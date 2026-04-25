@@ -4,6 +4,8 @@
 
 # 📝 Pika – Capture Now, Enhance Later
 
+> **Status**: archived public experiment. This repo is kept visible as a snapshot of an early Swift note-capture and AI-enhancement app idea, not as an actively maintained project.
+
 <p align="center">
   <img src="Resources/Icon/icon_resource.png" alt="Pika Logo" width="150" />
 </p>
